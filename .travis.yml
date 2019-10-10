@@ -8,22 +8,22 @@ env:
     - APP_PASSWORD=$MAIL_PASSWORD
 
 before_install:
-  - docker build -t jcsolutions/test-amz-inv-chk -f ./Dockerfile.dev .
+  - docker build -t jcsolutions/test-amz-inv-chk-pc -f ./Dockerfile.dev .
 
 script:
   - echo "skipping tests"
 
 after_success:
-  - docker build -t jcsolutions/amz-inv-chk ./amz-inv-chk
+  - docker build -t jcsolutions/amz-inv-chk-pc ./amz-inv-chk
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
-  - docker push jcsolutions/amz-inv-chk
+  - docker push jcsolutions/amz-inv-chk-pc
 
 deploy:
   provider: elasticbeanstalk
-  region: us-east-1
+  region: us-east-2
   app: amz-inv-chk-test
   env: AmzInvChkTest-env
-  bucket_name: elasticbeanstalk-us-east-1-440224658945
+  bucket_name: elasticbeanstalk-us-east-2-515063441717
   bucket_path: amz-inv-chk-test
   on:
     branch: master
