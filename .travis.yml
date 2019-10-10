@@ -1,0 +1,32 @@
+sudo: required
+services:
+  - checkloop
+
+env:
+  global:
+    - APP_ADDRESS=$MAIL_ADDRESS
+    - APP_PASSWORD=$MAIL_PASSWORD
+
+before_install:
+  - docker build -t jcsolutions/test-amz-inv-chk -f ./Dockerfile.dev .
+
+script:
+  - echo "skipping tests"
+
+after_success:
+  - docker build -t jcsolutions/amz-inv-chk ./amz-inv-chk
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  - docker push jcsolutions/amz-inv-chk
+
+deploy:
+  provider: elasticbeanstalk
+  region: us-east-1
+  app: amz-inv-chk-test
+  env: AmzInvChkTest-env
+  bucket_name: elasticbeanstalk-us-east-1-440224658945
+  bucket_path: amz-inv-chk-test
+  on:
+    branch: master
+  acces_key_id: $AWS_ACCESS_KEY_ID
+  secret_access_key:
+    secure: $AWS_SECRET_ACCESS_KEY
